@@ -3,7 +3,9 @@
 ## 目标
 将 publish 到 HiveMQ 的数据按照 ts(时间戳) topic(消息主题) payload(消息内容) 实时写入 TDengine 数据库  
 写入支持 HTTP 和 SDK 两种方式
-增加对payload(消息内容，需要json格式)中的某个字段（xml中可定义）保存为超级表子表，同时将payload某个字段(xml中定义)保存到超级有表子表中对应字段中
+
+## Fork更新内容
+增加对payload(消息内容，需要json格式)中的某个字段（xml中可定义）保存为超级表子表，同时将payload某个字段(xml中定义)保存到超级有表子表中对应字段中，目前只支持 SDK 方式
 
 ## 执行过程
 > + 读取配置文件
@@ -16,6 +18,8 @@
 >   - payload 列名在配置文件 PayloadColumn 配置项
 >   - 如果 payload 包含特殊字符(GBK 无法编码)尝试使用 base64 编码 payload
 >   - 出现异常将抛弃该消息并打印异常
+>   - TableNameField 列名在配置文件 TableNameField 配置项，用于在超级表下自动创建子表的表名，因表名不能以数字开头，字段会在此值前加字符"t"前缀，查询时需增加此前缀，此值设置为空则使用原有保存逻辑
+>   - CurrentField 列名在配置文件 CurrentField 配置项，用于将payload中需要保存的值保存至子表对应字段中，如果 payload 中有多个需要保存的值，需自行修改代码编译
 > + 插件卸载时调用关闭数据库连接
 
 ## 架构
