@@ -3,6 +3,7 @@
 ## 目标
 将 publish 到 HiveMQ 的数据按照 ts(时间戳) topic(消息主题) payload(消息内容) 实时写入 TDengine 数据库  
 写入支持 HTTP 和 SDK 两种方式
+增加对payload(消息内容，需要json格式)中的某个字段（xml中可定义）保存为超级表子表，同时将payload某个字段(xml中定义)保存到超级有表子表中对应字段中
 
 ## 执行过程
 > + 读取配置文件
