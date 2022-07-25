@@ -16,6 +16,10 @@
     <!--    table name default mqtt_payload-->
     <table>mqtt_payload</table>
     <!--    topic column name default topic-->
+    <TableNameField>id</TableNameField>
+    <!--    auto create table name with payload Field key-->
+    <currentField>current</currentField>
+    <!--    save value name with payload Field key-->
     <topicColumn>mqtt_topic</topicColumn>
     <!--    payload column name default payload-->
     <PayloadColumn>payload</PayloadColumn>
