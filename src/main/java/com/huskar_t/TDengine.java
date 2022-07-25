@@ -65,6 +65,8 @@ public class TDengine {
     private String table;
     private String topicColumn;
     private String PayloadColumn;
+    private String TableNameField;//Playload中用于创建表名的字段名,Payload需要返回json结构
+    private String CurrentField;//Playload中需要保存值的字段名,Payload需要返回json结构
     private String insertTemplate;
     private final CloseableHttpClient client;
     private boolean httpLock;
@@ -86,6 +88,8 @@ public class TDengine {
         this.setPassword(root.elementTextTrim("password"));
         this.setDb(root.elementTextTrim("db"));
         this.setTable(root.elementTextTrim("table"));
+        this.setTableNameField(root.elementTextTrim("TableNameField"));
+        this.setCurrentField(root.elementTextTrim("CurrentField"));
         this.setTopicColumn(root.elementTextTrim("topicColumn"));
         this.setPayloadColumn(root.elementTextTrim("PayloadColumn"));
         this.setMaxlength(Integer.valueOf(root.elementTextTrim("maxlength")));
@@ -265,12 +269,23 @@ public class TDengine {
      * @return boolen
      */
     public boolean saveData(String topic, String payload) {
-        final String sql = String.format(
+	JSONObject jsonObject;
+	jsonObject = JSONObject.parseObject(payload);
+	String tableNameField = this.getTableNameField();
+	String currentField = this.getCurrentField();
+	String tableName = "t"+jsonObject.getString(tableNameField); 
+	float current = jsonObject.getFloat(currentField); 
+        String sql = "";
+        if(!tableNameField.isEmpty()){
+		sql = String.format("INSERT INTO %s.%s USING %s.%s TAGS (1, 1) values (now,'%s','%s','%s')", this.getDb(),tableName, this.getDb(), this.getTable(), current, 0.0 , 0.0);
+	}else{
+		sql = String.format(
                 this.getInsertTemplate(),
                 topic,
                 payload
-        );
-
+        	);
+	}
+	
         switch (this.getType()) {
             case "http":
                 if (this.isHttpLock()) {
@@ -455,6 +470,24 @@ public class TDengine {
             payloadColumn = "payload";
         }
         PayloadColumn = payloadColumn;
+    }
+    public String getTableNameField() {
+        return TableNameField;
+    }
+
+    public void setTableNameField(String tableNameField) {
+        if (tableNameField.equals("")) {
+            tableNameField = "";
+        }
+        this.TableNameField = tableNameField;
+    }
+
+    public String getCurrentField() {
+        return CurrentField;
+    }
+
+    public void setCurrentField(String currentField) {
+        this.CurrentField = currentField;
     }
 
     public String getInsertTemplate() {
